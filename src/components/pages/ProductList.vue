@@ -1,7 +1,7 @@
 <template>
 <div>
 <base-dialog v-if="!!error" title="Error Occured" @close="confirmError">
-  {{error}}
+      {{ error }}
 </base-dialog>
   <section>
     <the-search></the-search>
@@ -29,11 +29,11 @@
 </template>
 
 <script>
-import ProductFilter from '../products/ProductFilter.vue';
+import ProductFilter from "../products/ProductFilter.vue";
 import ProductItem from "../products/ProductItem.vue";
 import TheSearch from "../search/TheSearch.vue";
 import BaseButton from "../ui/BaseButton.vue";
-import BaseDialog from '../ui/BaseDialog.vue';
+import BaseDialog from "../ui/BaseDialog.vue";
 
 export default {
   components: { ProductItem, BaseButton, TheSearch, BaseDialog, ProductFilter },
@@ -44,35 +44,56 @@ export default {
       limit: 6, // Number of products loaded at a time
       totalProducts: 0,
       isInitialLoad: true,
-      activeFilters : {
+      activeFilters: {
         Filter1: true,
         Filter2: true,
         Filter3: true,
-      }
+      },
     };
   },
   computed: {
     allProducts() {
       return this.$store.getters["getProducts"];
     },
-    filteredProducts(){
+    filteredProducts() {
       const products = this.$store.getters["getProducts"];
-      return products.filter(product => {
-        if(this.activeFilters.Filter1 && product.price>=100 && product.price<500 ){
+
+      if (
+        !this.activeFilters.Filter1 &&
+        !this.activeFilters.Filter2 &&
+        !this.activeFilters.Filter3
+      ) {
+        return products; // return all products if no filters are active
+      }
+
+      return products.filter((product) => {
+        if (
+          this.activeFilters.Filter1 &&
+          product.price >= 100 &&
+          product.price < 500
+        ) {
           return true;
         }
-        if(this.activeFilters.Filter2 && product.price>=500 && product.price<1000 ){
+        if (
+          this.activeFilters.Filter2 &&
+          product.price >= 500 &&
+          product.price < 1000
+        ) {
           return true;
         }
-        if(this.activeFilters.Filter3 && product.price>=1000 && product.price<1500 ){
+        if (
+          this.activeFilters.Filter3 &&
+          product.price >= 1000 &&
+          product.price < 1500
+        ) {
           return true;
         }
         return false;
       });
-    }
+    },
   },
   methods: {
-    setFilters(updatedFilters){
+    setFilters(updatedFilters) {
       this.activeFilters = updatedFilters;
     },
     async loadProducts() {
@@ -83,11 +104,14 @@ export default {
       }
 
       try {
-        await this.$store.dispatch('loadProducts', { limit: this.limit, offset: this.offset });
+        await this.$store.dispatch("loadProducts", {
+          limit: this.limit,
+          offset: this.offset,
+        });
         this.offset += this.limit;
         this.isInitialLoad = false; 
       } catch (error) {
-        this.error = error.message || 'Something went wrong';
+        this.error = error.message || "Something went wrong";
       }
     },
     loadMore() {
@@ -95,13 +119,12 @@ export default {
     },
     confirmError() {
       this.error = null;
-    }
+    },
   },
   created() {
     this.loadProducts();
   },
 };
-
 </script>
 
 <style scoped>
@@ -121,7 +144,6 @@ export default {
   justify-content: center;
   width: 100%;
 }
-
 
 .product-item {
   flex: 0 1 calc(33.333% - 20px);
@@ -149,4 +171,3 @@ export default {
   }
 }
 </style>
-
